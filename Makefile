@@ -1,7 +1,8 @@
 OBJS := main.o
 APP := app
 
-CFLAGS := -O2 -Wall -Werror -static
+CFLAGS := -O2 -Wall -Werror -static -fPIE -fstack-protector-all -D_FORTIFY_SOURCE=2
+LDFLAGS := -Wl,-z,now -Wl,-z,relro
 
 .DEFAULT_GOAL := $(APP)
 
@@ -26,7 +27,7 @@ clean:
 	rm -rf *.o $(APP) *.dbg
 
 $(APP): $(OBJS)
-	$(CC) $(CFLAGS) $(DEBUG) -o $@ $<
+	$(CC) $(CFLAGS) $(DEBUG) -o $@ $< $(LDFLAGS)
 
 $(OBJS): %.o : %.c
 	$(CC) $(CFLAGS) $(DEBUG) -o $@ -c $^
