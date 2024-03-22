@@ -1,0 +1,50 @@
+To load src outside of directory:
+
+    mv main.c ../
+    ./app
+    coredumpctl debug
+    directory ../
+
+To get symbols outside of directory
+
+    mv ./app.dbg ../
+    ./app
+    coredumpctl debug
+    symbol-file ../app.dbg
+    run
+
+Though these work, you may want to always try to specify the source first
+so you don't see:
+
+    main (argc=1, argv=0x7fffffffdde8) at main.c:7
+    7	main.c: No such file or directory.
+    (gdb) bt
+    #0  main (argc=1, argv=0x7fffffffdde8) at main.c:7
+    (gdb) list
+    2	in main.c
+
+and instead see:
+
+    (gdb) directory ../
+    Source directories searched: /home/fred/Projects/tests/nulldref/..:$cdir:$cwd
+    (gdb) bt
+    #0  main (argc=1, argv=0x7fffffffdde8) at main.c:7
+    (gdb) list
+    2	#include <stdlib.h>
+    3
+    4	int main(int argc, char *argv[])
+    5	{
+    6	    char *buf = NULL;
+    7	    int value = *buf;
+    8	    printf("test: %d\n", value);
+    9	    return 0;
+    10	}
+    (gdb) run
+    The program being debugged has been started already.
+    Start it from the beginning? (y or n) y
+    Starting program: /home/fred/Projects/tests/nulldref/app
+
+    Program received signal SIGSEGV, Segmentation fault.
+    main (argc=1, argv=0x7fffffffdde8) at main.c:7
+    7	    int value = *buf;
+
